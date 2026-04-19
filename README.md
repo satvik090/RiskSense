@@ -117,6 +117,55 @@ Real-time scoring is kept separate from analytics so the API stays fast.
 * **Latency** — tracked average and p95
 * **Failure handling** — fallback instead of crashing
 * **Separation of concerns** — real-time vs async analytics
+  
+## Design Decisions & Trade-offs
+
+This project focuses more on system design choices than just feature building.
+
+### Why hybrid (rules + ML)?
+
+* Rules are fast and explainable (e.g., high amount, new category)
+* ML helps catch less obvious patterns
+* Trade-off: slightly more complexity, but better coverage
+
+---
+
+### Why Redis?
+
+* Used for caching, idempotency, and rate limiting
+* Keeps latency low and avoids recomputation
+* Trade-off: adds external dependency, but improves performance significantly
+
+---
+
+### Why idempotent APIs?
+
+* In financial systems, duplicate transactions can occur
+* Prevents double processing using transaction_id
+* Trade-off: requires extra checks, but critical for correctness
+
+---
+
+### Why separate anomaly detection from scoring?
+
+* Real-time scoring needs to be fast
+* Analytics can run asynchronously
+* Trade-off: eventual consistency, but better latency
+
+---
+
+### Why not a full database (PostgreSQL)?
+
+* Used in-memory + Redis for simplicity and speed
+* Trade-off: not persistent, but easier to iterate and demonstrate system design
+
+---
+
+### Why simple event queue (simulated)?
+
+* Shows how real systems decouple components
+* Trade-off: not production-grade, but demonstrates architecture clearly
+
 
 ---
 
